@@ -49,6 +49,9 @@
             padding: 1.5rem;
             border-radius: 10px;
             text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         .result-label {
             font-size: 0.9rem;
@@ -79,6 +82,24 @@
             background-color: var(--accent);
             transform: translateY(-3px);
             box-shadow: 0 10px 15px rgba(0,0,0,0.3);
+        }
+        .reroll-btn {
+            margin-top: 1rem;
+            padding: 0.4rem 1rem;
+            font-size: 0.85rem;
+            width: auto;
+            border-radius: 20px;
+            background-color: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            box-shadow: none;
+            font-weight: bold;
+        }
+        .reroll-btn:hover {
+            background-color: var(--primary);
+            color: var(--bg);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
         }
         .back-link {
             margin-top: 2rem;
@@ -188,34 +209,42 @@
             <div class="result-item">
                 <div class="result-label">Chassis Type</div>
                 <div class="result-value" id="res-chassis">-</div>
+                <button class="reroll-btn" onclick="reroll('chassis')">Reroll</button>
             </div>
             <div class="result-item">
                 <div class="result-label">Engine Type</div>
                 <div class="result-value" id="res-engine">-</div>
+                <button class="reroll-btn" onclick="reroll('engine')">Reroll</button>
             </div>
             <div class="result-item">
                 <div class="result-label">Year</div>
                 <div class="result-value" id="res-year">-</div>
+                <button class="reroll-btn" onclick="reroll('year')">Reroll</button>
             </div>
             <div class="result-item">
                 <div class="result-label">Origin</div>
                 <div class="result-value" id="res-origin">-</div>
+                <button class="reroll-btn" onclick="reroll('origin')">Reroll</button>
             </div>
             <div class="result-item">
                 <div class="result-label">Target Weight</div>
                 <div class="result-value" id="res-weight">-</div>
+                <button class="reroll-btn" onclick="reroll('weight')">Reroll</button>
             </div>
             <div class="result-item">
                 <div class="result-label">Target HP</div>
                 <div class="result-value" id="res-hp">-</div>
+                <button class="reroll-btn" onclick="reroll('hp')">Reroll</button>
             </div>
             <div class="result-item">
                 <div class="result-label">Car Type</div>
                 <div class="result-value" id="res-type">-</div>
+                <button class="reroll-btn" onclick="reroll('type')">Reroll</button>
             </div>
             <div class="result-item">
                 <div class="result-label">Wheel Drive</div>
                 <div class="result-value" id="res-drive">-</div>
+                <button class="reroll-btn" onclick="reroll('drive')">Reroll</button>
             </div>
         </div>
         <div class="options">
@@ -360,6 +389,60 @@
                 document.getElementById("res-type").textContent = type;
                 document.getElementById("res-drive").textContent = drive;
             }, 200); // Change text halfway through the spin
+        }
+
+        function reroll(category) {
+            const currentChassis = document.getElementById("res-chassis").textContent;
+            let data = chassisData[currentChassis];
+            if (!data) data = chassisData["Sedan"]; // Fallback if no valid chassis
+
+            let newValue = "Any";
+            
+            switch(category) {
+                case 'chassis':
+                    newValue = getRandomItem(Object.keys(chassisData));
+                    break;
+                case 'engine':
+                    newValue = getRandomItem(data.engines);
+                    break;
+                case 'year':
+                    if (document.getElementById("chk-year").checked) newValue = getRandomItem(years);
+                    break;
+                case 'origin':
+                    if (document.getElementById("chk-origin").checked) newValue = getRandomItem(origins);
+                    break;
+                case 'weight':
+                    if (document.getElementById("chk-weight").checked) {
+                        const weight = Math.round(getRandomInt(data.minWeight, data.maxWeight) / 100) * 100;
+                        newValue = weight + " kg";
+                    }
+                    break;
+                case 'hp':
+                    if (document.getElementById("chk-hp").checked) {
+                        const realisticHp = document.getElementById("chk-realistic-hp").checked;
+                        const engine = document.getElementById("res-engine").textContent;
+                        const engData = engineData[engine] || { minHp: 100, maxHp: 1500 };
+                        const minHp = realisticHp ? engData.minHp : 100;
+                        const maxHp = realisticHp ? engData.maxHp : 1500;
+                        let hp = Math.round(getRandomInt(minHp, maxHp) / 50) * 50;
+                        newValue = hp + " HP (± 50)";
+                    }
+                    break;
+                case 'type':
+                    if (document.getElementById("chk-type").checked) newValue = getRandomItem(data.types);
+                    break;
+                case 'drive':
+                    if (document.getElementById("chk-drive").checked) newValue = getRandomItem(wheelDrives);
+                    break;
+            }
+
+            const el = document.getElementById("res-" + category);
+            el.classList.remove('spin');
+            void el.offsetWidth; // Trigger reflow to restart animation
+            el.classList.add('spin');
+            setTimeout(() => {
+                el.textContent = newValue;
+            }, 200);
         }
 
         // Generate a car right when the page loads
