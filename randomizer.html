@@ -152,6 +152,7 @@
             width: auto;
             border-radius: 15px;
             background-color: var(--surface);
+            color: var(--fg);
             border: 2px solid var(--primary);
         }
         @keyframes wheelspin {
@@ -179,10 +180,6 @@
             <button class="timer-btn" style="background-color: var(--primary); color: var(--bg);" onclick="startTimer()">Start</button>
             <button class="timer-btn" onclick="pauseTimer()">Pause</button>
             <button class="timer-btn" onclick="resetTimer()">Reset</button>
-        </div>
-        <div class="timer-controls" style="margin-bottom: 0;">
-            <button class="timer-btn" onclick="setTimer(5)">5 Min (Engine)</button>
-            <button class="timer-btn" onclick="setTimer(10)">10 Min (Chassis)</button>
         </div>
     </div>
 
@@ -265,11 +262,6 @@
             const m = Math.floor(timeRemaining / 60).toString().padStart(2, '0');
             const s = (timeRemaining % 60).toString().padStart(2, '0');
             document.getElementById('timer-display').textContent = `${m}:${s}`;
-        }
-
-        function setTimer(minutes) {
-            document.getElementById('timer-input').value = minutes;
-            resetTimer();
         }
 
         function startTimer() {
