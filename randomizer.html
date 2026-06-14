@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automation Randomizer</title>
+    <style>
+        :root {
+            --bg: #1a1b26;
+            --fg: #c0caf5;
+            --primary: #7aa2f7;
+            --surface: #24283b;
+            --accent: #9ece6a;
+        }
+        body {
+            margin: 0;
+            padding: 2rem;
+            background-color: var(--bg);
+            color: var(--fg);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        h1 {
+            color: var(--primary);
+            letter-spacing: 2px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        .container {
+            background-color: var(--surface);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            max-width: 600px;
+            width: 100%;
+        }
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .result-item {
+            background-color: var(--bg);
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .result-label {
+            font-size: 0.9rem;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+        .result-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent);
+        }
+        button {
+            background-color: var(--primary);
+            color: var(--bg);
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            width: 100%;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+        button:hover {
+            background-color: var(--accent);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px rgba(0,0,0,0.3);
+        }
+        .back-link {
+            margin-top: 2rem;
+            color: var(--fg);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .back-link:hover {
+            color: var(--primary);
+        }
+        .options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            justify-content: center;
+            background-color: var(--bg);
+            padding: 1rem;
+            border-radius: 10px;
+        }
+        .options label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            font-size: 0.95rem;
+            color: var(--fg);
+            user-select: none;
+        }
+        .options input[type="checkbox"] {
+            accent-color: var(--primary);
+            width: 1.2rem;
+            height: 1.2rem;
+            cursor: pointer;
+        }
+        @media (max-width: 600px) {
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Automation Car Randomizer</h1>
+    <div class="container">
+        <div class="result-grid">
+            <div class="result-item">
+                <div class="result-label">Chassis Type</div>
+                <div class="result-value" id="res-chassis">-</div>
+            </div>
+            <div class="result-item">
+                <div class="result-label">Engine Type</div>
+                <div class="result-value" id="res-engine">-</div>
+            </div>
+            <div class="result-item">
+                <div class="result-label">Year</div>
+                <div class="result-value" id="res-year">-</div>
+            </div>
+            <div class="result-item">
+                <div class="result-label">Origin</div>
+                <div class="result-value" id="res-origin">-</div>
+            </div>
+            <div class="result-item">
+                <div class="result-label">Target Weight</div>
+                <div class="result-value" id="res-weight">-</div>
+            </div>
+            <div class="result-item">
+                <div class="result-label">Target HP</div>
+                <div class="result-value" id="res-hp">-</div>
+            </div>
+        </div>
+        <div class="options">
+            <label><input type="checkbox" id="chk-year" checked> Include Year</label>
+            <label><input type="checkbox" id="chk-origin" checked> Include Origin</label>
+            <label><input type="checkbox" id="chk-weight" checked> Include Weight</label>
+            <label><input type="checkbox" id="chk-hp" checked> Include HP</label>
+            <label><input type="checkbox" id="chk-realistic-hp" checked> Realistic HP Limits</label>
+        </div>
+        <button onclick="generateCar()">Generate Random Car</button>
+    </div>
+    <a href="index.html" class="back-link">← Back to Startpage</a>
+
+    <script>
+        // We restrict engine choices based on the chassis to maintain realism
+        const chassisData = {
+            "Hatchback": { engines: ["Inline 3", "Inline 4", "Inline 5", "V6", "Boxer 4"], minWeight: 800, maxWeight: 1400 },
+            "Sedan": { engines: ["Inline 3", "Inline 4", "Inline 5", "Inline 6", "V6", "V8", "Boxer 4", "Boxer 6"], minWeight: 1100, maxWeight: 1900 },
+            "Coupe": { engines: ["Inline 4", "Inline 5", "Inline 6", "V6", "V8", "V10", "V12", "Boxer 4", "Boxer 6"], minWeight: 1000, maxWeight: 1800 },
+            "Station Wagon": { engines: ["Inline 4", "Inline 5", "Inline 6", "V6", "V8", "Boxer 4"], minWeight: 1200, maxWeight: 2000 },
+            "SUV": { engines: ["Inline 4", "Inline 5", "Inline 6", "V6", "V8", "V10", "V12"], minWeight: 1400, maxWeight: 2500 },
+            "Pickup": { engines: ["Inline 4", "Inline 5", "Inline 6", "V6", "V8", "V10"], minWeight: 1300, maxWeight: 2500 },
+            "Van": { engines: ["Inline 4", "Inline 6", "V6", "V8"], minWeight: 1200, maxWeight: 2200 },
+            "Convertible": { engines: ["Inline 4", "Inline 6", "V6", "V8", "V10", "V12", "Boxer 4", "Boxer 6"], minWeight: 1100, maxWeight: 1900 },
+            "Supercar": { engines: ["V6", "V8", "V10", "V12", "V16", "Boxer 6"], minWeight: 1000, maxWeight: 1600 }
+        };
+
+        // Automation years rounded to every decade
+        const years = [1940, 1950, 1960, 1970, 1980, 1990, 2000, 2010, 2020];
+        const origins = ["USA", "Japan/JDM", "Euro"];
+
+        // Realistic HP ranges for different engine types
+        const engineData = {
+            "Inline 3": { minHp: 50, maxHp: 250 },
+            "Inline 4": { minHp: 100, maxHp: 450 },
+            "Inline 5": { minHp: 150, maxHp: 500 },
+            "Inline 6": { minHp: 200, maxHp: 800 },
+            "V6": { minHp: 200, maxHp: 800 },
+            "V8": { minHp: 250, maxHp: 1000 },
+            "V10": { minHp: 400, maxHp: 900 },
+            "V12": { minHp: 500, maxHp: 1000 },
+            "V16": { minHp: 1000, maxHp: 1500 },
+            "Boxer 4": { minHp: 100, maxHp: 400 },
+            "Boxer 6": { minHp: 250, maxHp: 800 }
+        };
+
+        function getRandomItem(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function generateCar() {
+            const chassisTypes = Object.keys(chassisData);
+            const chassis = getRandomItem(chassisTypes);
+            const data = chassisData[chassis];
+            
+            const engine = getRandomItem(data.engines);
+
+            const includeYear = document.getElementById("chk-year").checked;
+            const includeOrigin = document.getElementById("chk-origin").checked;
+            const includeWeight = document.getElementById("chk-weight").checked;
+            const includeHp = document.getElementById("chk-hp").checked;
+            const realisticHp = document.getElementById("chk-realistic-hp").checked;
+
+            const year = includeYear ? getRandomItem(years) : "Any";
+            const origin = includeOrigin ? getRandomItem(origins) : "Any";
+
+            let weightText = "Any";
+            if (includeWeight) {
+                const weight = Math.round(getRandomInt(data.minWeight, data.maxWeight) / 100) * 100;
+                weightText = weight + " kg";
+            }
+            
+            let hpText = "Any";
+            if (includeHp) {
+                const minHp = realisticHp ? engineData[engine].minHp : 100;
+                const maxHp = realisticHp ? engineData[engine].maxHp : 1500;
+                let hp = Math.round(getRandomInt(minHp, maxHp) / 50) * 50;
+                hpText = hp + " HP (± 50)";
+            }
+
+            document.getElementById("res-chassis").textContent = chassis;
+            document.getElementById("res-engine").textContent = engine;
+            document.getElementById("res-year").textContent = year;
+            document.getElementById("res-origin").textContent = origin;
+            document.getElementById("res-weight").textContent = weightText;
+            document.getElementById("res-hp").textContent = hpText;
+        }
+
+        // Generate a car right when the page loads
+        window.onload = generateCar;
+    </script>
+</body>
+</html>
