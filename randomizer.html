@@ -255,6 +255,7 @@
             <label><input type="checkbox" id="chk-type" checked> Include Type</label>
             <label><input type="checkbox" id="chk-drive" checked> Include Drive</label>
             <label><input type="checkbox" id="chk-realistic-hp" checked> Realistic HP Limits</label>
+            <label><input type="checkbox" id="chk-realistic-weight" checked> Realistic Weight Limits</label>
         </div>
         <button onclick="generateCar()">Generate Random Car</button>
     </div>
@@ -350,6 +351,7 @@
             const includeWeight = document.getElementById("chk-weight").checked;
             const includeHp = document.getElementById("chk-hp").checked;
             const realisticHp = document.getElementById("chk-realistic-hp").checked;
+            const realisticWeight = document.getElementById("chk-realistic-weight").checked;
             const includeType = document.getElementById("chk-type").checked;
             const includeDrive = document.getElementById("chk-drive").checked;
 
@@ -360,7 +362,11 @@
 
             let weightText = "Any";
             if (includeWeight) {
-                const weight = Math.round(getRandomInt(data.minWeight, data.maxWeight) / 100) * 100;
+                let maxWeight = data.maxWeight;
+                if (realisticWeight && (origin === "Japan/JDM" || origin === "Euro")) {
+                    maxWeight = Math.min(maxWeight, 2000);
+                }
+                const weight = Math.round(getRandomInt(data.minWeight, maxWeight) / 100) * 100;
                 weightText = weight + " kg";
             }
             
@@ -413,7 +419,13 @@
                     break;
                 case 'weight':
                     if (document.getElementById("chk-weight").checked) {
-                        const weight = Math.round(getRandomInt(data.minWeight, data.maxWeight) / 100) * 100;
+                        let maxWeight = data.maxWeight;
+                        const realisticWeight = document.getElementById("chk-realistic-weight").checked;
+                        const currentOrigin = document.getElementById("res-origin").textContent;
+                        if (realisticWeight && (currentOrigin === "Japan/JDM" || currentOrigin === "Euro")) {
+                            maxWeight = Math.min(maxWeight, 2000);
+                        }
+                        const weight = Math.round(getRandomInt(data.minWeight, maxWeight) / 100) * 100;
                         newValue = weight + " kg";
                     }
                     break;
