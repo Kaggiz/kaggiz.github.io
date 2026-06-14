@@ -114,6 +114,14 @@
             height: 1.2rem;
             cursor: pointer;
         }
+        @keyframes wheelspin {
+            0% { transform: rotateX(0deg); opacity: 1; }
+            50% { transform: rotateX(180deg); opacity: 0; }
+            100% { transform: rotateX(360deg); opacity: 1; }
+        }
+        .spin {
+            animation: wheelspin 0.4s ease-in-out;
+        }
         @media (max-width: 600px) {
             .result-grid {
                 grid-template-columns: 1fr;
@@ -232,12 +240,21 @@
                 hpText = hp + " HP (± 50)";
             }
 
-            document.getElementById("res-chassis").textContent = chassis;
-            document.getElementById("res-engine").textContent = engine;
-            document.getElementById("res-year").textContent = year;
-            document.getElementById("res-origin").textContent = origin;
-            document.getElementById("res-weight").textContent = weightText;
-            document.getElementById("res-hp").textContent = hpText;
+            const results = document.querySelectorAll('.result-value');
+            results.forEach(el => {
+                el.classList.remove('spin');
+                void el.offsetWidth; // Trigger reflow to restart animation
+                el.classList.add('spin');
+            });
+
+            setTimeout(() => {
+                document.getElementById("res-chassis").textContent = chassis;
+                document.getElementById("res-engine").textContent = engine;
+                document.getElementById("res-year").textContent = year;
+                document.getElementById("res-origin").textContent = origin;
+                document.getElementById("res-weight").textContent = weightText;
+                document.getElementById("res-hp").textContent = hpText;
+            }, 200); // Change text halfway through the spin
         }
 
         // Generate a car right when the page loads
