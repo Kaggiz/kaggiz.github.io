@@ -2,9 +2,107 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>My GitHub Page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>kaggiz - Startpage</title>
+    <style>
+        :root {
+            --bg: #1a1b26;
+            --fg: #c0caf5;
+            --primary: #7aa2f7;
+            --surface: #24283b;
+            --accent: #9ece6a;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg);
+            color: var(--fg);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+            letter-spacing: 2px;
+        }
+        #clock {
+            font-size: 1.5rem;
+            margin-bottom: 2.5rem;
+            color: var(--accent);
+        }
+        .search-container {
+            margin-bottom: 3rem;
+        }
+        input[type="text"] {
+            padding: 15px 25px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 30px;
+            background-color: var(--surface);
+            color: var(--fg);
+            width: 400px;
+            max-width: 80vw;
+            outline: none;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            transition: box-shadow 0.3s ease;
+        }
+        input[type="text"]:focus {
+            box-shadow: 0 10px 25px -3px rgba(122, 162, 247, 0.4);
+        }
+        .links {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        a {
+            text-decoration: none;
+            color: var(--fg);
+            background-color: var(--surface);
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: bold;
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+        }
+        a:hover {
+            background-color: var(--primary);
+            color: var(--bg);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+    </style>
 </head>
 <body>
-    <h1>Hello, world! My website is officially live. test edit</h1>
+    <h1>Welcome, kaggiz</h1>
+    <div id="clock">00:00:00</div>
+    
+    <div class="search-container">
+        <form action="https://www.google.com/search" method="get">
+            <input type="text" name="q" placeholder="Search the web..." autofocus autocomplete="off">
+        </form>
+    </div>
+
+    <div class="links">
+        <a href="https://github.com/kaggiz">GitHub</a>
+        <a href="https://mail.google.com">Gmail</a>
+        <a href="https://reddit.com">Reddit</a>
+        <a href="https://youtube.com">YouTube</a>
+    </div>
+
+    <script>
+        function updateClock() {
+            const now = new Date();
+            const options = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+            document.getElementById('clock').textContent = now.toLocaleTimeString(undefined, options);
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+    </script>
 </body>
 </html>
